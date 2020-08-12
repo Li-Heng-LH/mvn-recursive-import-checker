@@ -8,6 +8,7 @@ import java.util.List;
 public class DataManager {
 
     private static DataManager INSTANCE;
+    private boolean needToResolveImportStar;
     private String testProjectPath;
     private String testJarPath;
     private String targetJarPath;
@@ -17,6 +18,7 @@ public class DataManager {
     private HashSet<String> targetClasses;
 
     private DataManager() {
+        needToResolveImportStar = false;
         jarPaths = new ArrayList<>();
         knowledgeBase = new HashMap<>();
         classesNeeded = new HashSet<>();
@@ -28,6 +30,14 @@ public class DataManager {
             INSTANCE = new DataManager();
         }
         return INSTANCE;
+    }
+
+    public boolean isNeedToResolveImportStar() {
+        return needToResolveImportStar;
+    }
+
+    public void setNeedToResolveImportStar(boolean needToResolveImportStar) {
+        this.needToResolveImportStar = needToResolveImportStar;
     }
 
     public String getTestProjectPath() {

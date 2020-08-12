@@ -74,6 +74,9 @@ public class JarDecompiler {
                     String importName = importNameWithSemicolon.substring(0, importNameWithSemicolon.length() - 1);
                     if (!importName.startsWith("java.")) {
                         imports.add(importName);
+                        if (importName.endsWith(".*")) {
+                            DataManager.getInstance().setNeedToResolveImportStar(true);
+                        }
                     }
                 }
             } else if (afterPackage
