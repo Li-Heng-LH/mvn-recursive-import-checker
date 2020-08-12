@@ -40,7 +40,7 @@ public class CheckerRunner {
             new MvnDependencyListRunner().run();
 
             for (String jarPath : DataManager.getInstance().getJarPaths()) {
-                JarDecompiler.setIncludeImports(true);
+                JarDecompiler.setDecompileType(Constants.decompileType.DEPENDENCY);
                 JarDecompiler.decompile(jarPath);
             }
         }

@@ -15,4 +15,7 @@ public class Constants {
                     "Exiting application. \n" +
                     "Please check the logs for details.";
 
+    public enum decompileType {
+        SOURCE, DEPENDENCY, TARGET
+    }
 }

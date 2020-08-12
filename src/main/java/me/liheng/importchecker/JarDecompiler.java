@@ -8,14 +8,12 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class JarDecompiler {
     public static final Logger LOG = LoggerFactory.getLogger(JarDecompiler.class);
 
-    private static boolean includeImports = false;
+    private static Constants.decompileType type;
 
     public static void decompile(String jarPath) {
         System.out.println("Decompiling: " + jarPath + ". It may take a while...");
@@ -58,18 +56,26 @@ public class JarDecompiler {
     private static void parseJavaLines(String [] javaLines) {
         StringBuilder sb = new StringBuilder();
         boolean afterPackage = false;
+        List<String> imports = new ArrayList<>();
 
         for (String line : javaLines) {
             line = line.trim().replaceAll(" +", " ");
 
             if (line.startsWith("package ") && line.endsWith(";")) {
-                String packageNameWithSemicolon = line.split(" ")[1];
+                String packageNameWithSemicolon = line.substring("package ".length());
                 packageNameWithSemicolon = packageNameWithSemicolon.replaceAll(" +", "");
                 String packageName = packageNameWithSemicolon.substring(0, packageNameWithSemicolon.length() - 1);
                 sb.append(packageName);
                 afterPackage = true;
             } else if (afterPackage && line.startsWith("import ") && line.endsWith(";")) {
-
+                if (type == Constants.decompileType.DEPENDENCY) {
+                    String importNameWithSemicolon = line.substring("import ".length());
+                    importNameWithSemicolon = importNameWithSemicolon.replaceAll(" +", "");
+                    String importName = importNameWithSemicolon.substring(0, importNameWithSemicolon.length() - 1);
+                    if (!importName.startsWith("java.")) {
+                        imports.add(importName);
+                    }
+                }
             } else if (afterPackage
                     && (line.contains("class ") || line.contains("interface ") || line.contains("enum "))
                     && !line.startsWith("//") && !line.startsWith("/*") && !line.startsWith("*")) {
@@ -79,7 +85,12 @@ public class JarDecompiler {
                 for (i = 0; i < tokens.length; i++) {
                     if (tokens[i].contains("class") || tokens[i].contains("interface") || tokens[i].contains("enum")) break;
                 }
-                sb.append(":").append(tokens[++i].split("<")[0]);
+                sb.append(".").append(tokens[++i].split("<")[0]);
+                if (type == Constants.decompileType.DEPENDENCY) {
+                    DataManager.getInstance().getKnowledgeBase().put(sb.toString(),imports);
+                    imports = new ArrayList<>();
+                }
+
                 LOG.debug(sb.toString());
                 afterPackage = false;
                 sb.setLength(0);
@@ -87,7 +98,7 @@ public class JarDecompiler {
         }
     }
 
-    public static void setIncludeImports(boolean includeImports) {
-        JarDecompiler.includeImports = includeImports;
+    public static void setDecompileType(Constants.decompileType type) {
+        JarDecompiler.type = type;
     }
 }
