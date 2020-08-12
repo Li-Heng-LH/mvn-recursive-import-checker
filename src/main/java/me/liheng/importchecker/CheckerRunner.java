@@ -3,8 +3,11 @@ package me.liheng.importchecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class CheckerRunner {
@@ -31,19 +34,72 @@ public class CheckerRunner {
         if (testType == 1) {
             //test on third-party jar
             do {
-                System.out.println("Please enter the path to the artifact jar that you want to test on: ");
-                System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0 )");
+                System.out.println("Please enter the directory path to the artifact jar that you want to test on: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0) ");
                 DataManager.getInstance().setTestProjectPath(scanner.nextLine());
             } while (DataManager.getInstance().getTestProjectPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTestProjectPath())));
             LOG.info("User input test jar path as {}.", DataManager.getInstance().getTestProjectPath());
 
-            new MvnDependencyListRunner().run();
+            do {
+                System.out.println("Please enter the directory path to the artifact jar that you want to see if it is being imported: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/commons-collections/commons-collections/3.2.2) ");
+                DataManager.getInstance().setTargetJarPath(scanner.nextLine());
+            } while (DataManager.getInstance().getTargetJarPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTargetJarPath())));
+            LOG.info("User input target jar path as {}.", DataManager.getInstance().getTargetJarPath());
 
-            for (String jarPath : DataManager.getInstance().getJarPaths()) {
-                JarDecompiler.setDecompileType(Constants.decompileType.DEPENDENCY);
-                JarDecompiler.decompile(jarPath);
+            decompileSourceJar();
+            decompileDependencyJars();
+            decompileTargetJar();
+
+
+
+            System.out.println("************************");
+            for (String s : DataManager.getInstance().getClassesNeeded()) {
+                System.out.println(s);
+            }
+            System.out.println("************************");
+            for (Map.Entry<String, List<String>> entry: DataManager.getInstance().getKnowledgeBase().entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+            System.out.println("************************");
+            for (String s : DataManager.getInstance().getTargetClasses()) {
+                System.out.println(s);
             }
         }
 
+    }
+
+    private void decompileSourceJar() {
+        String jarPath = "";
+        File dir = new File(DataManager.getInstance().getTestProjectPath());
+        for (File file : dir.listFiles()) {
+            if (file.getName().toLowerCase().endsWith((".jar"))) {
+                jarPath = file.toPath().toString();
+                break;
+            }
+        }
+        JarDecompiler.setDecompileType(Constants.decompileType.SOURCE);
+        JarDecompiler.decompile(jarPath);
+    }
+
+    private void decompileDependencyJars() {
+        new MvnDependencyListRunner().run();
+        for (String jarPath : DataManager.getInstance().getJarPaths()) {
+            JarDecompiler.setDecompileType(Constants.decompileType.DEPENDENCY);
+            JarDecompiler.decompile(jarPath);
+        }
+    }
+
+    private void decompileTargetJar() {
+        String jarPath = "";
+        File dir = new File(DataManager.getInstance().getTargetJarPath());
+        for (File file : dir.listFiles()) {
+            if (file.getName().toLowerCase().endsWith((".jar"))) {
+                jarPath = file.toPath().toString();
+                break;
+            }
+        }
+        JarDecompiler.setDecompileType(Constants.decompileType.TARGET);
+        JarDecompiler.decompile(jarPath);
     }
 }

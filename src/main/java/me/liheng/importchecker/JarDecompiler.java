@@ -68,7 +68,7 @@ public class JarDecompiler {
                 sb.append(packageName);
                 afterPackage = true;
             } else if (afterPackage && line.startsWith("import ") && line.endsWith(";")) {
-                if (type == Constants.decompileType.DEPENDENCY) {
+                if (type == Constants.decompileType.DEPENDENCY || type == Constants.decompileType.SOURCE) {
                     String importNameWithSemicolon = line.substring("import ".length());
                     importNameWithSemicolon = importNameWithSemicolon.replaceAll(" +", "");
                     String importName = importNameWithSemicolon.substring(0, importNameWithSemicolon.length() - 1);
@@ -86,9 +86,19 @@ public class JarDecompiler {
                     if (tokens[i].contains("class") || tokens[i].contains("interface") || tokens[i].contains("enum")) break;
                 }
                 sb.append(".").append(tokens[++i].split("<")[0]);
-                if (type == Constants.decompileType.DEPENDENCY) {
-                    DataManager.getInstance().getKnowledgeBase().put(sb.toString(),imports);
-                    imports = new ArrayList<>();
+                switch (type) {
+                    case DEPENDENCY:
+                        DataManager.getInstance().getKnowledgeBase().put(sb.toString(),imports);
+                        imports = new ArrayList<>();
+                        break;
+                    case SOURCE:
+                        DataManager.getInstance().getClassesNeeded().add(sb.toString());
+                        DataManager.getInstance().getKnowledgeBase().put(sb.toString(),imports);
+                        imports = new ArrayList<>();
+                        break;
+                    case TARGET:
+                        DataManager.getInstance().getTargetClasses().add(sb.toString());
+                        break;
                 }
 
                 LOG.debug(sb.toString());
