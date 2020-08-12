@@ -3,6 +3,8 @@ package me.liheng.importchecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class CheckerRunner {
@@ -28,14 +30,15 @@ public class CheckerRunner {
 
         if (testType == 1) {
             //test on third-party jar
-            System.out.println("Please enter the path to the artifact jar that you want to test on: ");
-            System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0 )");
-            DataManager.getInstance().setTestProjectPath(scanner.nextLine());
+            do {
+                System.out.println("Please enter the path to the artifact jar that you want to test on: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0 )");
+                DataManager.getInstance().setTestProjectPath(scanner.nextLine());
+            } while (DataManager.getInstance().getTestProjectPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTestProjectPath())));
             LOG.info("User input test jar path as {}.", DataManager.getInstance().getTestProjectPath());
 
             new MvnDependencyListRunner().run();
         }
-
 
     }
 }
