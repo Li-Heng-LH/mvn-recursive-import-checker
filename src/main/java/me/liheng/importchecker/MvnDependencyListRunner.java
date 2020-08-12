@@ -68,7 +68,8 @@ public class MvnDependencyListRunner {
                                 dependencyLine.contains(":system:") || dependencyLine.contains(":import:"))) {
 
                     String[] tokens = dependencyLine.split(":");
-                    System.out.println((tokens[tokens.length - 1])); ////
+                    String jarPath = tokens[tokens.length - 1].trim().split(" ")[0];
+                    DataManager.getInstance().getJarPaths().add(jarPath);
                 }
             }
             process.waitFor();

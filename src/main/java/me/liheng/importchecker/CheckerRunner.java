@@ -38,6 +38,11 @@ public class CheckerRunner {
             LOG.info("User input test jar path as {}.", DataManager.getInstance().getTestProjectPath());
 
             new MvnDependencyListRunner().run();
+
+            for (String jarPath : DataManager.getInstance().getJarPaths()) {
+                JarDecompiler.setIncludeImports(true);
+                JarDecompiler.decompile(jarPath);
+            }
         }
 
     }

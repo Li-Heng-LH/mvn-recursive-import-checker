@@ -17,6 +17,10 @@
             <AppenderRef ref="SimpleFile"/>
         </Logger>
 
+        <Logger name = "me.liheng.importchecker.JarDecompiler" level = "all" additivity = "false">
+            <AppenderRef ref="SimpleFile"/>
+        </Logger>
+
         <Root level="all">
             <AppenderRef ref="SimpleFile"/>
         </Root>

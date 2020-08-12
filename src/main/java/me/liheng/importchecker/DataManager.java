@@ -1,11 +1,17 @@
 package me.liheng.importchecker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DataManager {
 
     private static DataManager INSTANCE;
     private String testProjectPath;
+    private List<String> jarPaths;
 
-    private DataManager() {}
+    private DataManager() {
+        jarPaths = new ArrayList<>();
+    }
 
     public static DataManager getInstance() {
         if(INSTANCE == null) {
@@ -20,5 +26,9 @@ public class DataManager {
 
     public void setTestProjectPath(String testProjectPath) {
         this.testProjectPath = testProjectPath;
+    }
+
+    public List<String> getJarPaths() {
+        return jarPaths;
     }
 }
