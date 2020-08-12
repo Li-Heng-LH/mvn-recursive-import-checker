@@ -9,6 +9,7 @@ public class DataManager {
 
     private static DataManager INSTANCE;
     private String testProjectPath;
+    private String testJarPath;
     private String targetJarPath;
     private List<String> jarPaths;
     private HashMap<String, List<String>> knowledgeBase;
@@ -35,6 +36,14 @@ public class DataManager {
 
     public void setTestProjectPath(String testProjectPath) {
         this.testProjectPath = testProjectPath;
+    }
+
+    public String getTestJarPath() {
+        return testJarPath;
+    }
+
+    public void setTestJarPath(String testJarPath) {
+        this.testJarPath = testJarPath;
     }
 
     public String getTargetJarPath() {

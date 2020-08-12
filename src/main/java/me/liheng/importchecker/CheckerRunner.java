@@ -38,11 +38,18 @@ public class CheckerRunner {
                 System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0) ");
                 DataManager.getInstance().setTestProjectPath(scanner.nextLine());
             } while (DataManager.getInstance().getTestProjectPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTestProjectPath())));
-            LOG.info("User input test jar path as {}.", DataManager.getInstance().getTestProjectPath());
+            LOG.info("User input test project path as {}.", DataManager.getInstance().getTestProjectPath());
 
             do {
-                System.out.println("Please enter the directory path to the artifact jar that you want to see if it is being imported: ");
-                System.out.println("(for example: /Users/liheng/.m2/repository/commons-collections/commons-collections/3.2.2) ");
+                System.out.println("Please enter the file path to the artifact jar that you want to test on: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/net/sf/jasperreports/jasperreports/6.13.0/jasperreports-6.13.0.jar) ");
+                DataManager.getInstance().setTestJarPath(scanner.nextLine());
+            } while (DataManager.getInstance().getTestJarPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTestJarPath())));
+            LOG.info("User input test jar path as {}.", DataManager.getInstance().getTestJarPath());
+
+            do {
+                System.out.println("Please enter the file path to the artifact jar that you want to see if it is being imported: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar) ");
                 DataManager.getInstance().setTargetJarPath(scanner.nextLine());
             } while (DataManager.getInstance().getTargetJarPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTargetJarPath())));
             LOG.info("User input target jar path as {}.", DataManager.getInstance().getTargetJarPath());
@@ -53,33 +60,31 @@ public class CheckerRunner {
 
 
 
+            // Debug
             System.out.println("************************");
             for (String s : DataManager.getInstance().getClassesNeeded()) {
                 System.out.println(s);
             }
+            System.out.println(DataManager.getInstance().getClassesNeeded().size());
+
             System.out.println("************************");
             for (Map.Entry<String, List<String>> entry: DataManager.getInstance().getKnowledgeBase().entrySet()) {
                 System.out.println(entry.getKey() + ": " + entry.getValue());
             }
+            System.out.println(DataManager.getInstance().getKnowledgeBase().size());
+
             System.out.println("************************");
             for (String s : DataManager.getInstance().getTargetClasses()) {
                 System.out.println(s);
             }
+            System.out.println(DataManager.getInstance().getTargetClasses().size());
         }
 
     }
 
     private void decompileSourceJar() {
-        String jarPath = "";
-        File dir = new File(DataManager.getInstance().getTestProjectPath());
-        for (File file : dir.listFiles()) {
-            if (file.getName().toLowerCase().endsWith((".jar"))) {
-                jarPath = file.toPath().toString();
-                break;
-            }
-        }
         JarDecompiler.setDecompileType(Constants.decompileType.SOURCE);
-        JarDecompiler.decompile(jarPath);
+        JarDecompiler.decompile(DataManager.getInstance().getTestJarPath());
     }
 
     private void decompileDependencyJars() {
@@ -91,15 +96,7 @@ public class CheckerRunner {
     }
 
     private void decompileTargetJar() {
-        String jarPath = "";
-        File dir = new File(DataManager.getInstance().getTargetJarPath());
-        for (File file : dir.listFiles()) {
-            if (file.getName().toLowerCase().endsWith((".jar"))) {
-                jarPath = file.toPath().toString();
-                break;
-            }
-        }
         JarDecompiler.setDecompileType(Constants.decompileType.TARGET);
-        JarDecompiler.decompile(jarPath);
+        JarDecompiler.decompile(DataManager.getInstance().getTargetJarPath());
     }
 }

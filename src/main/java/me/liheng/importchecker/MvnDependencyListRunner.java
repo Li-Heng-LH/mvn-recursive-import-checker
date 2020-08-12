@@ -73,6 +73,7 @@ public class MvnDependencyListRunner {
                 }
             }
             process.waitFor();
+            r.close();
         } catch (Exception e) {
             LOG.error("Error running mvn dependency:list.", e);
             System.out.println(Constants.EXIT_WITH_ERROR_MESSAGE);
