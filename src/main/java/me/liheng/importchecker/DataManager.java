@@ -17,6 +17,7 @@ public class DataManager {
     private HashSet<String> classesNeeded;
     private HashSet<String> targetClasses;
     private HashSet<String> visited;
+    private HashSet<String> intersection;
 
     private DataManager() {
         needToResolveImportStar = false;
@@ -25,6 +26,7 @@ public class DataManager {
         classesNeeded = new HashSet<>();
         targetClasses = new HashSet<>();
         visited = new HashSet<>();
+        intersection = new HashSet<>();
     }
 
     public static DataManager getInstance() {
@@ -84,5 +86,9 @@ public class DataManager {
 
     public HashSet<String> getVisited() {
         return visited;
+    }
+
+    public HashSet<String> getIntersection() {
+        return intersection;
     }
 }

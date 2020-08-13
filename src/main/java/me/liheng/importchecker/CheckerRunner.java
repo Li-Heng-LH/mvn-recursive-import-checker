@@ -63,29 +63,20 @@ public class CheckerRunner {
 
             ImportsResolver.resolveRecursiveImports();
 
+            ResultsAnalyser.analyse();
 
             LOG.info("Total number of classes needed for test jar: {}", DataManager.getInstance().getVisited().size());
             LOG.info("Total number of classes contained in target jar: {}", DataManager.getInstance().getTargetClasses().size());
             LOG.info("Total number of entries in knowledge base: {}", DataManager.getInstance().getKnowledgeBase().size());
+            LOG.info("Total number of classes in intersection set: {}", DataManager.getInstance().getIntersection().size());
 
             // Debug
             System.out.println("************************");
-            for (String s : DataManager.getInstance().getVisited()) {
-                System.out.println(s);
-            }
             System.out.println(DataManager.getInstance().getVisited().size());
-
-            System.out.println("************************");
-            for (Map.Entry<String, List<String>> entry: DataManager.getInstance().getKnowledgeBase().entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
             System.out.println(DataManager.getInstance().getKnowledgeBase().size());
-
-            System.out.println("************************");
-            for (String s : DataManager.getInstance().getTargetClasses()) {
-                System.out.println(s);
-            }
             System.out.println(DataManager.getInstance().getTargetClasses().size());
+            System.out.println(DataManager.getInstance().getIntersection().size());
+            System.out.println("************************");
         }
 
     }

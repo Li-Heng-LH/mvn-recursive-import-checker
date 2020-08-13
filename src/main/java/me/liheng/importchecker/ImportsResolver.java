@@ -49,7 +49,7 @@ public class ImportsResolver {
 
     private static void dfs(String className) {
         DataManager.getInstance().getVisited().add(className);
-        for (String importClass: DataManager.getInstance().getKnowledgeBase().get(className)) {
+        for (String importClass: DataManager.getInstance().getKnowledgeBase().getOrDefault(className, new ArrayList<>())) {
             if (!DataManager.getInstance().getVisited().contains(importClass)) {
                 dfs(importClass);
             }
