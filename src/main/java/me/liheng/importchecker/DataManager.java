@@ -16,6 +16,7 @@ public class DataManager {
     private HashMap<String, List<String>> knowledgeBase;
     private HashSet<String> classesNeeded;
     private HashSet<String> targetClasses;
+    private HashSet<String> visited;
 
     private DataManager() {
         needToResolveImportStar = false;
@@ -23,6 +24,7 @@ public class DataManager {
         knowledgeBase = new HashMap<>();
         classesNeeded = new HashSet<>();
         targetClasses = new HashSet<>();
+        visited = new HashSet<>();
     }
 
     public static DataManager getInstance() {
@@ -78,5 +80,9 @@ public class DataManager {
 
     public HashSet<String> getTargetClasses() {
         return targetClasses;
+    }
+
+    public HashSet<String> getVisited() {
+        return visited;
     }
 }

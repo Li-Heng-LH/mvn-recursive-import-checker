@@ -61,13 +61,19 @@ public class CheckerRunner {
                 ImportsResolver.resolveImportStar();
             }
 
+            ImportsResolver.resolveRecursiveImports();
+
+
+            LOG.info("Total number of classes needed for test jar: {}", DataManager.getInstance().getVisited().size());
+            LOG.info("Total number of classes contained in target jar: {}", DataManager.getInstance().getTargetClasses().size());
+            LOG.info("Total number of entries in knowledge base: {}", DataManager.getInstance().getKnowledgeBase().size());
 
             // Debug
             System.out.println("************************");
-            for (String s : DataManager.getInstance().getClassesNeeded()) {
+            for (String s : DataManager.getInstance().getVisited()) {
                 System.out.println(s);
             }
-            System.out.println(DataManager.getInstance().getClassesNeeded().size());
+            System.out.println(DataManager.getInstance().getVisited().size());
 
             System.out.println("************************");
             for (Map.Entry<String, List<String>> entry: DataManager.getInstance().getKnowledgeBase().entrySet()) {
