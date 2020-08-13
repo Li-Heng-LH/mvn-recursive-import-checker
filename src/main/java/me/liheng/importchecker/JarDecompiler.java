@@ -53,7 +53,7 @@ public class JarDecompiler {
 
     }
 
-    private static void parseJavaLines(String [] javaLines) {
+    public static void parseJavaLines(String [] javaLines) {
         StringBuilder sb = new StringBuilder();
         boolean afterPackage = false;
         List<String> imports = new ArrayList<>();

@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Scanner;
 
 public class CheckerRunner {
@@ -15,6 +15,7 @@ public class CheckerRunner {
     private int testType = 0;
 
     public void run() {
+        Instant start = Instant.now();
         Scanner scanner = new Scanner(System.in);
         System.out.println(Constants.BANNER);
 
@@ -57,28 +58,43 @@ public class CheckerRunner {
             decompileDependencyJars();
             decompileTargetJar();
 
-            if (DataManager.getInstance().isNeedToResolveImportStar()) {
-                ImportsResolver.resolveImportStar();
+        } else if (testType == 2) {
+            //test on project
+            do {
+                System.out.println("Please enter the directory path to the project that you want to test on: ");
+                System.out.println("(for example: /Users/liheng/test-mvn-recursive-import-checker) ");
+                DataManager.getInstance().setTestProjectPath(scanner.nextLine());
             }
+            while (DataManager.getInstance().getTestProjectPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTestProjectPath())));
+            LOG.info("User input test project path as {}.", DataManager.getInstance().getTestProjectPath());
 
-            ImportsResolver.resolveRecursiveImports();
+            do {
+                System.out.println("Please enter the file path to the artifact jar that you want to see if it is being imported: ");
+                System.out.println("(for example: /Users/liheng/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar) ");
+                DataManager.getInstance().setTargetJarPath(scanner.nextLine());
+            }
+            while (DataManager.getInstance().getTargetJarPath().isEmpty() || !Files.exists(Paths.get(DataManager.getInstance().getTargetJarPath())));
+            LOG.info("User input target jar path as {}.", DataManager.getInstance().getTargetJarPath());
 
-            ResultsAnalyser.analyse();
-
-            LOG.info("Total number of classes needed for test jar: {}", DataManager.getInstance().getVisited().size());
-            LOG.info("Total number of classes contained in target jar: {}", DataManager.getInstance().getTargetClasses().size());
-            LOG.info("Total number of entries in knowledge base: {}", DataManager.getInstance().getKnowledgeBase().size());
-            LOG.info("Total number of classes in intersection set: {}", DataManager.getInstance().getIntersection().size());
-
-            // Debug
-            System.out.println("************************");
-            System.out.println(DataManager.getInstance().getVisited().size());
-            System.out.println(DataManager.getInstance().getKnowledgeBase().size());
-            System.out.println(DataManager.getInstance().getTargetClasses().size());
-            System.out.println(DataManager.getInstance().getIntersection().size());
-            System.out.println("************************");
+            FilesWalker.walkDirectory();
+            decompileDependencyJars();
+            decompileTargetJar();
         }
 
+        if (DataManager.getInstance().isNeedToResolveImportStar()) {
+            ImportsResolver.resolveImportStar();
+        }
+
+        ImportsResolver.resolveRecursiveImports();
+
+        ResultsAnalyser.analyse();
+
+        LOG.info("Total number of classes needed for test jar: {}", DataManager.getInstance().getVisited().size());
+        LOG.info("Total number of classes contained in target jar: {}", DataManager.getInstance().getTargetClasses().size());
+        LOG.info("Total number of entries in knowledge base: {}", DataManager.getInstance().getKnowledgeBase().size());
+        LOG.info("Total number of classes in intersection set: {}", DataManager.getInstance().getIntersection().size());
+        Instant finish = Instant.now();
+        LOG.info("Execution Time: {} milliseconds", Duration.between(start, finish).toMillis());
     }
 
     private void decompileSourceJar() {
